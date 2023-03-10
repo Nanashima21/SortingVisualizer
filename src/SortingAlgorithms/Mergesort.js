@@ -1,8 +1,9 @@
 export const getMergeSortAnimations = (array) => {
     const animations = [];
+    const array_ = [...array];
     if (array.length <= 1) return array;
-    const auxiliaryArray = [...array];
-    mergeSortHelper(array, 0, array.length - 1, auxiliaryArray, animations);
+    const auxiliaryArray = [...array_];
+    mergeSortHelper(array_, 0, array_.length - 1, auxiliaryArray, animations);
     return animations;
 }
   
