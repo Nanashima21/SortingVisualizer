@@ -1,151 +1,61 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState } from 'react';
 import './SortingVisualizer.css';
-import { useWindowSize } from '../hooks/useWindowSize';
 
-//Sort
-import { getMergeSortAnimations } from '../SortingAlgorithms/Mergesort';
+// Array
+import { useArrayGenerator } from '../hooks/useArrayGenerator';
+
+// Sort
 import { getBubbleSortAnimations } from '../SortingAlgorithms/Bubblesort';
+import { getSelectSortAnimations } from '../SortingAlgorithms/Selectsort';
+import { getInsertionSortAnimations } from '../SortingAlgorithms/Insertionsort';
+import { getQuickSortAnimations } from '../SortingAlgorithms/Quicksort';
+import { getMergeSortAnimations } from '../SortingAlgorithms/Mergesort';
+import { getHeapSortAnimations } from '../SortingAlgorithms/Heapsort';
 
 export const SortingVisualizer = () => {
-    const [width, height] = useWindowSize();
-
-    const [array, setStateArray] = useState([]);
-    const [array1, setStateArray1] = useState([]);
-    const [array2, setStateArray2] = useState([]);
-    const [blindarray, setStateBlindArray] = useState([]);
-
     const [isClicked, setIsClicked] = useState(true);
     const onClickSwitch = () => setIsClicked(!isClicked);
-    const [isGenerated, setIsGenerated] = useState(false);
-    const generate = () => setIsGenerated(true);
     const [isSorting, setIsSorting] = useState(false);
     const startSort = () => setIsSorting(true);
+
+    const [width, array, array1, array2, blindarray] = useArrayGenerator();
     
-    const items = ["Bubble Sort", "Merge Sort"];
-    const [selectSort, setSelectSort] = useState("Bubble Sort");
+    const items = ["Bubble Sort", "Select Sort", "Insertion Sort", "Quick Sort", "Merge Sort", "Heap Sort"];
+    const [chosenSort, setSelectSort] = useState("Bubble Sort");
     const handleChange = (e) => setSelectSort(e.target.value);
-    const [selectSort1, setSelectSort1] = useState("Bubble Sort");
+    const [chosenSort1, setSelectSort1] = useState("Bubble Sort");
     const handleChange1 = (e) => setSelectSort1(e.target.value);
-    const [selectSort2, setSelectSort2] = useState("Bubble Sort");
+    const [chosenSort2, setSelectSort2] = useState("Bubble Sort");
     const handleChange2 = (e) => setSelectSort2(e.target.value);
-
-    const determineheight = () => {
-        const blindarray_ = [];
-        blindarray_.push(9*height/10);
-        setStateBlindArray(blindarray_);
-    }
-
-    //Array
-    const generateRandomArray = () => {
-        generate();
-        determineheight();
-        const array_ = [];
-        const array1_ = [];
-        const array2_ = [];
-        for (let i = 0; i < width/10 ; i++) 
-            array_.push(randomIntFromInterval(5, 8*height/10));
-        
-        for (let i = 0; i < width/20 ; i++) 
-            array1_.push(randomIntFromInterval(5, 8*height/10));
-        
-        for (let i = 0; i < width/20 ; i++) 
-            array2_.push(array1_[i]);
-
-        setStateArray(array_);
-        setStateArray1(array1_);
-        setStateArray2(array2_); 
-    }
-
-    //Sort
-    const mergeSort = (array_,array_bar_) => {
-        let animations = getMergeSortAnimations(array_);
-        for (let i = 0; i < animations.length; i++) {
-            let arrayBars = document.getElementsByClassName(array_bar_);
-            const isColorChange = i % 3 !== 2;
-            if (isColorChange) {
-                const [barOneIdx, barTwoIdx] = animations[i];
-                const barOneStyle = arrayBars[barOneIdx].style;
-                const barTwoStyle = arrayBars[barTwoIdx].style;
-                const color = i % 3 === 0 ? 'red' : 'orange';
-                setTimeout(() => {
-                    barOneStyle.backgroundColor = color;
-                    barTwoStyle.backgroundColor = color;
-                }, i * 3);
-            } else {
-                setTimeout(() => {
-                    const [barOneIdx, newHeight] = animations[i];
-                    const barOneStyle = arrayBars[barOneIdx].style;
-                    barOneStyle.height = `${newHeight}px`;
-                }, i * 3);
-            }
-        }
-    }
-
-    const bubbleSort = (array_, array_bar_) => {
-        let animations = getBubbleSortAnimations(array_);
-        for (let i = 0; i < animations.length; i++) {
-            let arrayBars = document.getElementsByClassName(array_bar_);
-            if (i % 4 < 2) {
-                const [barOneIdx, barTwoIdx] = animations[i];
-                const barOneStyle = arrayBars[barOneIdx].style;
-                const barTwoStyle = arrayBars[barTwoIdx].style;
-                const color = i % 2 === 0 ? 'red' : 'orange';
-                setTimeout(() => {
-                    barOneStyle.backgroundColor = color;
-                    barTwoStyle.backgroundColor = color;
-                }, i * 1);
-            } else {
-                if(i % 4 === 2) {
-                    setTimeout(() => {
-                        const [barOneIdx, newHeight] = animations[i];
-                        const barOneStyle = arrayBars[barOneIdx].style;
-                        barOneStyle.height = `${newHeight}px`;
-
-                    }, i * 1);
-                } else {
-                    setTimeout(() => {
-                        const [barOneIdx, newHeight] = animations[i];
-                        const barOneStyle = arrayBars[barOneIdx].style;
-                        barOneStyle.height = `${newHeight}px`;
-                    }, i * 1);
-                }
-            }
-        }
-    }
-
-    
 
     const doSortSingle = () => {
         startSort();
-        if (selectSort === "Bubble Sort") bubbleSort(array,"array-bar");
-        if (selectSort === "Merge Sort") mergeSort(array,"array-bar");
+        sortVisualize(chosenSort, array, "array-bar");
     } 
 
     const doSortCompare = () => {
         startSort();
-        if (selectSort1 === "Bubble Sort") bubbleSort(array1,"array-bar1");
-        if (selectSort2 === "Bubble Sort") bubbleSort(array2,"array-bar2");
-        if (selectSort1 === "Merge Sort") mergeSort(array1,"array-bar1");
-        if (selectSort2 === "Merge Sort") mergeSort(array2,"array-bar2");
+        sortVisualize(chosenSort1, array1, "array-bar1");
+        sortVisualize(chosenSort2, array2, "array-bar2");
     } 
 
-    //Output
+    // Output
     return (
         <>
+            <p className="text">How to simulate : Choose Sorttype -> Sort (-> Reset)</p>
             { isClicked ? (
                 <>
                     <div className="container">
-                        <button onClick={generateRandomArray} disabled={isSorting}>Generate Random Array</button>
-                        <button onClick={onClickSwitch} disabled={isSorting}>Compare Sort</button>
-                        <select value={selectSort} onChange={handleChange}>
+                        <button className="button" onClick={onClickSwitch} disabled={isSorting}>Compare Sort</button>
+                        <select className="button" value={chosenSort} onChange={handleChange}>
                             {items.map((item) => (
                                 <option key={item} value={item}>
                                     {item}
                                 </option>
                             ))}
                         </select>
-                        <button onClick={doSortSingle} disabled={isSorting} disabled={!isGenerated}>Sort</button>
-                        <button onClick={() => window.location.reload()}>Reset</button>
+                        <button className="button" onClick={doSortSingle} disabled={isSorting}>Sort</button>
+                        <button className="button" onClick={() => window.location.reload()}>Reset</button>
                     </div>
                     <div className="array-container">
                         {array.map((value, idx) => (
@@ -170,24 +80,23 @@ export const SortingVisualizer = () => {
             ) : (
                 <>
                     <div className="container">
-                        <button onClick={generateRandomArray} disabled={isSorting}>Generate Random Array</button>
-                        <button onClick={onClickSwitch} disabled={isSorting}>Single Sort</button>
-                        <select value={selectSort1} onChange={handleChange1}>
+                        <button className="button" onClick={onClickSwitch} disabled={isSorting}>Single Sort</button>
+                        <select className="button" value={chosenSort1} onChange={handleChange1}>
                             {items.map((item) => (
                                 <option key={item} value={item}>
-                                    {item}
+                                    Left : {item}
                                 </option>
                             ))}
                         </select>
-                        <select value={selectSort2} onChange={handleChange2}>
+                        <select className="button" value={chosenSort2} onChange={handleChange2}>
                             {items.map((item) => (
                                 <option key={item} value={item}>
-                                    {item}
+                                    Right : {item}
                                 </option>
                             ))}
                         </select>
-                        <button onClick={doSortCompare} disabled={isSorting} disabled={!isGenerated}>Compare</button>
-                        <button onClick={() => window.location.reload()}>Reset</button>
+                        <button className="button" onClick={doSortCompare} disabled={isSorting}>Compare</button>
+                        <button className="button" onClick={() => window.location.reload()}>Reset</button>
                     </div>
                     <div className="array-container">
                         {array1.map((value, idx) => (
@@ -221,6 +130,31 @@ export const SortingVisualizer = () => {
     );
 }
 
-const randomIntFromInterval = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+// Sort
+const sortVisualize = (sortType, array_, array_bar_) => {
+    let animations;
+    if (sortType === "Bubble Sort") animations = getBubbleSortAnimations(array_);
+    if (sortType === "Select Sort") animations = getSelectSortAnimations(array_);
+    if (sortType === "Insertion Sort") animations = getInsertionSortAnimations(array_);
+    if (sortType === "Quick Sort") animations = getQuickSortAnimations(array_);
+    if (sortType === "Merge Sort") animations = getMergeSortAnimations(array_);
+    if (sortType === "Heap Sort") animations = getHeapSortAnimations(array_);
+    let arrayBars = document.getElementsByClassName(array_bar_);
+    for (let i = 0; i < animations.length; i++) {
+        const [barOneIdx, barTwoIdxOrNewHeight, type, colorType] = animations[i];
+        if (type === 'color') {
+            const barOneStyle = arrayBars[barOneIdx].style;
+            const barTwoStyle = arrayBars[barTwoIdxOrNewHeight].style;
+            const color = colorType === 'even' ? 'red' : 'orange';
+            setTimeout(() => {
+                barOneStyle.backgroundColor = color;
+                barTwoStyle.backgroundColor = color;
+            }, i * 3);
+        } else {
+            const barOneStyle = arrayBars[barOneIdx].style;
+            setTimeout(() => {
+                barOneStyle.height = `${barTwoIdxOrNewHeight}px`;
+            }, i * 3);
+        }
+    }
 }

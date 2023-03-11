@@ -35,30 +35,30 @@ const doMerge = (
     while (i <= middleIdx && j <= endIdx) {
         // These are the values that we're comparing; we push them once
         // to change their color.
-        animations.push([i, j]);
+        animations.push([i, j, "color", "even"]);
         // These are the values that we're comparing; we push them a second
         // time to revert their color.
-        animations.push([i, j]);
+        animations.push([i, j, "color", "odd"]);
         if (auxiliaryArray[i] <= auxiliaryArray[j]) {
             // We overwrite the value at index k in the original array with the
             // value at index i in the auxiliary array.
-            animations.push([k, auxiliaryArray[i]]);
+            animations.push([k, auxiliaryArray[i], "swap", "null"]);
             mainArray[k++] = auxiliaryArray[i++];
         } else {
-            animations.push([k, auxiliaryArray[j]]);
+            animations.push([k, auxiliaryArray[j], "swap", "null"]);
             mainArray[k++] = auxiliaryArray[j++];
         }
     }
     while (i <= middleIdx) {
-        animations.push([i, i]);
-        animations.push([i, i]);
-        animations.push([k, auxiliaryArray[i]]);
+        animations.push([i, i, "color", "even"]);
+        animations.push([i, i, "color", "odd"]);
+        animations.push([k, auxiliaryArray[i], "swap", "null"]);
         mainArray[k++] = auxiliaryArray[i++];
     }
     while (j <= endIdx) {
-        animations.push([j, j]);
-        animations.push([j, j]);
-        animations.push([k, auxiliaryArray[j]]);
+        animations.push([j, j, "color", "even"]);
+        animations.push([j, j, "color", "odd"]);
+        animations.push([k, auxiliaryArray[j], "swap", "null"]);
         mainArray[k++] = auxiliaryArray[j++];
     }
 }
